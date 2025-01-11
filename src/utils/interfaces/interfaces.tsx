@@ -1,7 +1,7 @@
 export interface Participant {
-  id: number;
+  id: string;
   name: string;
   email: string,
-  workStart: Date,
-  workEnd: Date
+  workStart: string,
+  workEnd: string
 }

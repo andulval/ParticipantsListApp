@@ -16,6 +16,7 @@ export const ParticipantsList: React.FC = () => {
 
   return (
     <div>
+        <NavLink to={`/participants/new`}>New</NavLink>
       {participants.map((participant) => (
         <div key={participant.id}>
           {participant.name}{" "}
