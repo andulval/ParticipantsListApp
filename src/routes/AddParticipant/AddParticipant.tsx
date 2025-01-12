@@ -37,7 +37,7 @@ export const AddParticipant: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="container-forms mx-auto">
         <NavLink to="/">Back to list</NavLink>
         <h2>Add New Participant</h2>
         <Form submitHandler={handleAddParticipant} />

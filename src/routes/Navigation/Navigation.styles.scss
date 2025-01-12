@@ -1,0 +1,29 @@
+.c-navigation{
+  margin: 16px 0px;
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+
+  @media screen and (max-width: 800px) {
+    height: 60px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+  }
+
+  &__back{
+    display: flex;
+    gap: 8px;
+  }
+  a{
+    color: black;
+    outline: none;
+    text-decoration: none;
+
+    &:hover{
+        color: #555555;
+        outline: none;
+        text-decoration: none;
+    }
+  }
+}

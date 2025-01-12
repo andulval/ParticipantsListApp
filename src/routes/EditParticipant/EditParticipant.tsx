@@ -75,9 +75,13 @@ export const EditParticipant: React.FC = () => {
   }
 
   return (
-    <div>
-      <NavLink to="/">Back to list</NavLink>
-      {participant && <Form participant={participant} submitHandler={handleEditParticipant} />}
+    <div className="container-forms mx-auto">
+        <div className="container container__main px-0">
+            <div className="">
+                <h1>Edit Participant</h1>
+            </div>
+        {participant && <Form participant={participant} submitHandler={handleEditParticipant} />}
+        </div>
     </div>
   );
 };

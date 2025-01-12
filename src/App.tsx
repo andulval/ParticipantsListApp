@@ -1,18 +1,20 @@
 import React from "react";
-import "./App.css";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { ParticipantsList } from "./routes/ParticipantsList/ParticipantsList";
 import { EditParticipant } from "./routes/EditParticipant/EditParticipant";
 import { AddParticipant } from "./routes/AddParticipant/AddParticipant";
+import { Navigation } from "./routes/Navigation/Navigation";
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="App">
+      <div className="container">
         <Routes>
-          <Route path="/" element={<ParticipantsList />} />
-          <Route path="/participants/:id" element={<EditParticipant />} />
-          <Route path="/participants/new" element={<AddParticipant />} />
+        <Route path='/' element={<Navigation />}>
+                <Route index element={<ParticipantsList />} />
+                <Route path="/participants/:id" element={<EditParticipant />} />
+                <Route path="/participants/new" element={<AddParticipant />} />
+          </Route>
         </Routes>
       </div>
     </BrowserRouter>
