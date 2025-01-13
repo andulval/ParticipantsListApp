@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { Form } from "../../components/FormComponent/Form";
 import { Participant } from "../../utils/interfaces/interfaces";
 import { SubmitHandler } from "react-hook-form";
+import Spinner from "../../components/Spinner/Spinner.component"; 
 
 interface FormData {
   name: string;
@@ -16,6 +17,7 @@ export const EditParticipant: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -63,11 +65,17 @@ export const EditParticipant: React.FC = () => {
       }
     } catch (error) {
       console.error("Error occurred while updating participant:", error);
+    } finally {
+      navigate('/');
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div role="status" aria-live="assertive">
+        <Spinner />
+      </div>
+    );
   }
 
   if (error) {
@@ -76,12 +84,12 @@ export const EditParticipant: React.FC = () => {
 
   return (
     <div className="container-forms mx-auto">
-        <div className="container container__main px-0">
-            <div className="">
-                <h1>Edit Participant</h1>
-            </div>
-        {participant && <Form participant={participant} submitHandler={handleEditParticipant} />}
+      <div className="container container__main px-0">
+        <div>
+          <h1>Edit Participant</h1>
         </div>
+        {participant && <Form participant={participant} submitHandler={handleEditParticipant} />}
+      </div>
     </div>
   );
 };

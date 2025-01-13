@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Participant } from "../../utils/interfaces/interfaces";
-import { ReactComponent as ErrorSvg } from '../../assets/error.svg';
-import { ReactComponent as CalendarSvg } from '../../assets/calendar.svg';
+import { ReactComponent as ErrorIcon } from '../../assets/error.svg';
+import { ReactComponent as CalendarIcon } from '../../assets/calendar.svg';
 import './Form.styles.scss';
 
 interface FormProps {
-  participant?: Participant; // Optional participant for editing
-  submitHandler: SubmitHandler<FormData>; // Custom submit handler
+  participant?: Participant;
+  submitHandler: SubmitHandler<FormData>;
 }
 
-// Define the shape of the form inputs (no id here)
 interface FormData {
   name: string;
   email: string;
@@ -19,7 +18,7 @@ interface FormData {
 }
 
 const formatDateToCustomISO = (date: Date) => {
-  return date.toISOString().split(".")[0] + "Z"; // Remove milliseconds and keep only "T00:00Z"
+  return date.toISOString().split(".")[0] + "Z";
 };
 
 export const Form: React.FC<FormProps> = ({ participant, submitHandler }) => {
@@ -27,6 +26,8 @@ export const Form: React.FC<FormProps> = ({ participant, submitHandler }) => {
     register,
     handleSubmit,
     watch,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<FormData>({
     mode: "onChange",
@@ -43,28 +44,19 @@ export const Form: React.FC<FormProps> = ({ participant, submitHandler }) => {
   });
 
   const validationRules = {
-    name: { required: "Name cannot be blank" },
+    name: { required: "This field is required" },
     email: {
-      required: "Email cannot be blank",
+      required: "This field is required",
       pattern: {
         value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
         message: "Invalid email address",
       },
     },
     workStart: {
-      required: "Work start date is required",
-      validate: {
-        beforeWorkEnd: (value: string) => {
-          const workEndValue = watch("workEnd");
-          if (!workEndValue || new Date(value) >= new Date(workEndValue)) {
-            return "Work start must be before work end";
-          }
-          return true;
-        },
-      },
+      required: "This field is required"
     },
     workEnd: {
-      required: "Work end date is required",
+      required: "This field is required",
       validate: {
         afterWorkStart: (value: string) => {
           const workStartValue = watch("workStart");
@@ -77,107 +69,144 @@ export const Form: React.FC<FormProps> = ({ participant, submitHandler }) => {
     },
   };
 
+  const workStartValue = watch("workStart");
+
+  useEffect(() => {
+    if (workStartValue) {
+      const workEndValue = watch("workEnd");
+      if (workEndValue) {
+        const isValid = new Date(workEndValue) > new Date(workStartValue);
+        if (!isValid) {
+          setError("workEnd", { type: "manual", message: "Work end must be after work start" });
+        } else {
+          clearErrors("workEnd");
+        }
+      }
+    }
+  }, [workStartValue, watch, setError, clearErrors]);
+
+  const openCalendar = (id: string) => {
+    const input = document.getElementById(id) as HTMLInputElement | null;
+    if (input && typeof input.showPicker === "function") {
+      input.showPicker();
+    } else if (input) {
+      input.focus();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(submitHandler)}>
-      <div className="container">
-        <div className="row gap-40">
-            {/* Name Field */}
-            <div className="col-12 c-form-group">
+    <form onSubmit={handleSubmit(submitHandler)} aria-labelledby="formTitle">
+      <div className="container px-0">
+        <div className="row gap-40v">
+          <div className="col-md-12 c-form-group">
             <label htmlFor="name">Name *</label>
             <div className="c-input-wrapper">
-                <input
+              <input
                 id="name"
                 type="text"
                 {...register("name", validationRules.name)}
                 placeholder="Enter name"
                 className={`c-form-control ${errors.name ? "error" : ""}`}
-                />
-                {errors.name && (
-                <span className="error-icon">
-                    <ErrorSvg />
+                aria-invalid={errors.name ? "true" : "false"}
+                aria-describedby="nameError"
+              />
+              {errors.name && (
+                <span className="error-icon" role="alert" id="nameError">
+                  <ErrorIcon />
                 </span>
-                )}
+              )}
             </div>
-            {errors.name && (
-                <small className="c-text-danger">{errors.name.message}</small>
-            )}
-            </div>
+            {errors.name && <small className="c-text-danger" id="nameError">{errors.name.message}</small>}
+          </div>
 
-            {/* Email Field */}
-            <div className="col-12 c-form-group">
+          <div className="col-md-12 c-form-group">
             <label htmlFor="email">Email *</label>
             <div className="c-input-wrapper">
-                <input
+              <input
                 id="email"
                 type="email"
                 {...register("email", validationRules.email)}
                 placeholder="Enter email"
                 className={`c-form-control ${errors.email ? "error" : ""}`}
-                />
-                {errors.email && (
-                <span className="error-icon">
-                    <ErrorSvg />
+                aria-invalid={errors.email ? "true" : "false"}
+                aria-describedby="emailError"
+              />
+              {errors.email && (
+                <span className="error-icon" role="alert" id="emailError">
+                  <ErrorIcon />
                 </span>
-                )}
+              )}
             </div>
-            {errors.email && (
-                <small className="c-text-danger">{errors.email.message}</small>
-            )}
-            </div>
+            {errors.email && <small className="c-text-danger" id="emailError">{errors.email.message}</small>}
+          </div>
 
-            {/* Work Start and Work End Fields */}
-            <div className="col-md-6 c-form-group">
-  <label htmlFor="workStart">Work Start *</label>
-  <div className="c-input-wrapper">
-    <input
-      id="workStart"
-      type="date"
-      {...register("workStart", validationRules.workStart)}
-      className={`c-form-control ${errors.workStart ? "error" : ""}`}
-    />
-    <span
-      className="custom-calendar-icon"
-      onClick={() => document.getElementById("workStart")?.focus()} // Trigger the native picker
-    >
-      <img src="/path-to-your-calendar-icon.svg" alt="Calendar Icon" />
-    </span>
-    {errors.workStart && (
-      <span className="error-icon">
-        <ErrorSvg />
-      </span>
-    )}
-  </div>
-  {errors.workStart && (
-    <small className="c-text-danger">{errors.workStart.message}</small>
-  )}
-</div>
-
-            <div className="col-md-6 c-form-group">
-            <label htmlFor="workEnd">Work End *</label>
-            <div className="c-input-wrapper">
+          <div className="col-md-6">
+            <div className=" c-form-group">
+              <label htmlFor="workStart">Work Start *</label>
+              <div className={`c-input-wrapper c-date-input ${errors.workStart ? "error" : ""}`}>
                 <input
+                  id="workStart"
+                  type="date"
+                  {...register("workStart", validationRules.workStart)}
+                  className={`c-form-control c-form-control-date ${errors.workStart ? "error" : ""}`}
+                  aria-invalid={errors.workStart ? "true" : "false"}
+                  aria-describedby="workStartError"
+                />
+                <button
+                  type="button"
+                  className="calendar-btn"
+                  onClick={() => openCalendar("workStart")}
+                  aria-label="Open calendar for work start"
+                >
+                  <CalendarIcon />
+                </button>
+                {errors.workStart && (
+                  <span className="error-icon" role="alert" id="workStartError">
+                    <ErrorIcon />
+                  </span>
+                )}
+              </div>
+              {errors.workStart && (
+                <small className="c-text-danger" id="workStartError">{errors.workStart.message}</small>
+              )}
+            </div>
+          </div>
+
+          <div className="col-md-6 c-form-group">
+            <label htmlFor="workEnd">Work End *</label>
+            <div className={`c-input-wrapper c-date-input ${errors.workEnd ? "error" : ""}`}>
+              <input
                 id="workEnd"
                 type="date"
                 {...register("workEnd", validationRules.workEnd)}
-                className={`c-form-control ${errors.workEnd ? "error" : ""}`}
-                />
-                {errors.workEnd && (
-                <span className="error-icon">
-                    <ErrorSvg />
+                className={`c-form-control c-form-control-date ${errors.workEnd ? "error" : ""}`}
+                aria-invalid={errors.workEnd ? "true" : "false"}
+                aria-describedby="workEndError"
+              />
+              <button
+                type="button"
+                className="calendar-btn"
+                onClick={() => openCalendar("workEnd")}
+                aria-label="Open calendar for work end"
+              >
+                <CalendarIcon />
+              </button>
+              {errors.workEnd && (
+                <span className="error-icon" role="alert" id="workEndError">
+                  <ErrorIcon />
                 </span>
-                )}
+              )}
             </div>
             {errors.workEnd && (
-                <small className="c-text-danger">{errors.workEnd.message}</small>
+              <small className="c-text-danger" id="workEndError">{errors.workEnd.message}</small>
             )}
-            </div>
+          </div>
 
-            {/* Submit Button */}
-            <div className="col-12">
-            <button className="btn__black btn__submit" type="submit">
-                Submit
+          <div className="col-md-6">
+            <button className="btn__black btn__submit" type="submit" aria-live="polite">
+              Submit
             </button>
-            </div>
+          </div>
         </div>
       </div>
     </form>
