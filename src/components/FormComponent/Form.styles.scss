@@ -26,6 +26,7 @@
         background-clip: padding-box;
         border: 1px solid black;
         border-radius: 0;
+        box-sizing: border-box;
         transition: border-color 0.15s ease-in;
   
         &::placeholder {
@@ -38,9 +39,10 @@
         &:focus,
         &:focus-visible {
           background-color: #f7f7f7;
-          border: 1px solid #222222;
+          border: 2px solid #222222;
           box-shadow: 0px 0px 0px 2px #d3f2ff;
           border-radius: 0;
+          outline: none;
         }
   
         &.error {
@@ -94,39 +96,38 @@ color: #a3270c !important;
 
     &::placeholder{
         text-transform: uppercase;
-    }
-    &::placeholder {
         color: black;
         font-size: 18px;
         font-weight: 400;
         line-height: 24px;
-      }
+    }
 
-      &:focus,
-      &:focus-visible {
+    &:focus,
+    &:focus-visible {
+    background-color: #f7f7f7;
+    border: 2px solid #222222;
+    box-shadow: 0px 0px 0px 2px #d3f2ff;
+    border-radius: 0;
+    outline: none;
+    }
+
+    &.error {
+    box-shadow: 0px 0px 0px 2px #a3270c;
+    border-radius: 0;
+
+    &:focus,
+    &:focus-visible {
         background-color: #f7f7f7;
-        border: 1px solid #222222;
-        box-shadow: 0px 0px 0px 2px #d3f2ff;
-        border-radius: 0;
-      }
-
-      &.error {
         box-shadow: 0px 0px 0px 2px #a3270c;
         border-radius: 0;
-
-        &:focus,
-        &:focus-visible {
-          background-color: #f7f7f7;
-          box-shadow: 0px 0px 0px 2px #a3270c;
-          border-radius: 0;
-        }
-      }
+    }
+    }
     
     .calendar-btn {
         position: absolute;
-        right: 1px;
-        top: 50%;
-        height: calc(100% - 2px);
+        right: 2px;
+        top: calc(50% );
+        height: calc(100% - 4px);
         transform: translateY(-50%);
         background-color: white;
         border: none;
